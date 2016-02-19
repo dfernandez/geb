@@ -5,6 +5,6 @@ import (
 )
 
 func main() {
-	srv := server.New()
+	srv := server.Server{Addr:":8000"}
 	srv.Boot()
 }

@@ -1,2 +1,2 @@
 # ged
-Go web application with decorators
+Golang web application
