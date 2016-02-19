@@ -6,19 +6,17 @@ import (
 )
 
 type TplVars struct {
-	H1 string
+	Title string
+	Body string
 }
 
-func Home(w http.ResponseWriter, r *http.Request) {
-	t, err := template.ParseFiles("view/home.html")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+func Home(t *template.Template) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		tplVars := TplVars{
+			Title: "Go web!",
+			Body: "Golang web application",
+		}
 
-	tplVars := TplVars{
-		H1: "Go web!",
+		t.ExecuteTemplate(w, "layout", tplVars)
 	}
-
-	t.Execute(w, tplVars)
 }

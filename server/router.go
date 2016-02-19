@@ -6,6 +6,7 @@ import (
 
 	"github.com/dfernandez/geb/controller"
 	"github.com/dfernandez/geb/server/decorator"
+	"html/template"
 )
 
 var Router = func() *mux.Router {
@@ -17,7 +18,7 @@ var Router = func() *mux.Router {
 	router.NotFoundHandler = use(controller.Error404, logger)
 
 	// controllers
-	router.HandleFunc("/", use(controller.Home, logger))
+	router.HandleFunc("/", use(controller.Home(render("view/home.html")), logger))
 	router.HandleFunc("/error500", use(controller.Error500, logger))
 
 	return router
@@ -32,4 +33,10 @@ func use(h http.HandlerFunc, decors ...httpHandlerDecorator) http.HandlerFunc {
 		h = decorator.Do(h)
 	}
 	return h
+}
+
+func render(tpl string) *template.Template {
+	t, _ := template.ParseFiles("layout/layout.html", tpl)
+
+	return t
 }
