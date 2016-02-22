@@ -5,18 +5,17 @@ import (
 	"html/template"
 )
 
-type TplVars struct {
-	Title string
-	Body string
-}
+func Home(t *template.Template, tplVars TplVars) func(w http.ResponseWriter, r *http.Request) {
+	var homeVars struct {
+		Text1 string
+		Text2 string
+	}
 
-func Home(t *template.Template) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		tplVars := TplVars{
-			Title: "Go web!",
-			Body: "Golang web application",
-		}
+		homeVars.Text1 = "text 1"
+		homeVars.Text2 = "text 2"
 
+		tplVars.Body = homeVars
 		t.ExecuteTemplate(w, "layout", tplVars)
 	}
 }
