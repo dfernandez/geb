@@ -5,13 +5,13 @@ import (
 	"github.com/dfernandez/geb/controller"
 )
 
-func useTemplate(tpl string) (*template.Template, controller.TplVars) {
+func useTemplate(tpl string) (*template.Template, controller.TplData) {
 
 	t, _ := template.ParseFiles("layout/layout.html", tpl)
 
-	tplVars := controller.TplVars{
+	tplData := controller.TplData{
 		Title: "Go web!",
 	}
 
-	return t, tplVars
+	return t, tplData
 }

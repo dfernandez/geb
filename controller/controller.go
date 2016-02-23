@@ -1,6 +1,7 @@
 package controller
 
-type TplVars struct {
-	Title string
-	Body interface{}
+type TplData struct {
+	Title      string
+	Controller string
+	TplVars    interface{}
 }

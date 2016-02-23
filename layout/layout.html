@@ -5,7 +5,9 @@
     <title>{{ .Title }}</title>
 </head>
 <body>
-{{ template "content" . }}
+<p>{{ .Controller }}</p>
+<hr />
+{{ template "content" .TplVars }}
 </body>
 </html>
 {{ end }}

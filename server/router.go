@@ -13,13 +13,10 @@ var Router = func() *mux.Router {
 
 	// router
 	router := mux.NewRouter().StrictSlash(true)
-	router.NotFoundHandler = useHandler(controller.Error404, logger)
+	router.NotFoundHandler = useHandler(controller.Error404(useTemplate("templates/error404.html")), logger)
 
 	// controllers
-	router.HandleFunc("/", useHandler(controller.Home(useTemplate("view/home.html")), logger))
-
-	// errors
-	router.HandleFunc("/error500", useHandler(controller.Error500, logger))
+	router.HandleFunc("/", useHandler(controller.Home(useTemplate("templates/home.html")), logger))
 
 	return router
 }()

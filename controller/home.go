@@ -5,17 +5,19 @@ import (
 	"html/template"
 )
 
-func Home(t *template.Template, tplVars TplVars) func(w http.ResponseWriter, r *http.Request) {
-	var homeVars struct {
+func Home(t *template.Template, tplData TplData) func(w http.ResponseWriter, r *http.Request) {
+	var tplVars struct {
 		Text1 string
 		Text2 string
 	}
 
-	return func(w http.ResponseWriter, r *http.Request) {
-		homeVars.Text1 = "text 1"
-		homeVars.Text2 = "text 2"
+	tplData.Controller = "home"
 
-		tplVars.Body = homeVars
-		t.ExecuteTemplate(w, "layout", tplVars)
+	return func(w http.ResponseWriter, r *http.Request) {
+		tplVars.Text1 = "text 1"
+		tplVars.Text2 = "text 2"
+
+		tplData.TplVars = tplVars
+		t.ExecuteTemplate(w, "layout", tplData)
 	}
 }

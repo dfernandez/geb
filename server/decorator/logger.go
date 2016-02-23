@@ -16,7 +16,7 @@ func NewLogger() *Logger {
 	file, _ := os.OpenFile("logs/app.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	multi := io.MultiWriter(file, os.Stdout)
 
-	return &Logger{log.New(multi, "INFO: ", log.LstdFlags)}
+	return &Logger{log.New(multi, "", log.LstdFlags)}
 }
 
 func (l Logger) Do(h http.HandlerFunc) http.HandlerFunc {
