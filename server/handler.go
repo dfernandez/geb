@@ -1,6 +1,8 @@
 package server
 
-import "net/http"
+import (
+	"net/http"
+)
 
 type httpHandlerDecorator interface {
 	Do(http.HandlerFunc) http.HandlerFunc

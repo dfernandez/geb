@@ -22,11 +22,7 @@ func NewLogger() *Logger {
 func (l Logger) Do(h http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		t0 := time.Now()
-		defer func() {
-			t1 := time.Now()
-			l.Logger.Printf("%s Took: %s", r.RequestURI, t1.Sub(t0).String())
-		}()
-
 		h(w, r)
+		l.Logger.Printf("%s Took: %s", r.RequestURI, time.Now().Sub(t0).String())
 	}
 }
