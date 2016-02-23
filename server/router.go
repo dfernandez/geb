@@ -17,7 +17,10 @@ var Router = func() *mux.Router {
 	router.NotFoundHandler = useHandler(controller.Error404(useTemplate("templates/error404.html")), logger)
 
 	// controllers
-	router.HandleFunc("/", useHandler(controller.Home(useTemplate("templates/home.html")), auth, logger))
+	router.HandleFunc("/",        useHandler(controller.Home(useTemplate("templates/home.html")),       logger))
+	router.HandleFunc("/login",   useHandler(controller.Login(useTemplate("templates/login.html")),     logger))
+	router.HandleFunc("/logout",  useHandler(controller.Logout(),                                       logger))
+	router.HandleFunc("/private", useHandler(controller.Private(useTemplate("templates/private.html")), auth, logger))
 
 	return router
 }()
