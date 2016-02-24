@@ -7,7 +7,7 @@ import (
 	"github.com/dfernandez/geb/config"
 	"io/ioutil"
 	"encoding/json"
-	"github.com/dfernandez/geb/domain"
+	"github.com/dfernandez/geb/src/domain"
 )
 
 func Login(tpl *TplController) func(w http.ResponseWriter, r *http.Request) {

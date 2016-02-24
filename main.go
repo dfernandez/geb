@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/dfernandez/geb/server"
+	"github.com/dfernandez/geb/src/server"
 	"github.com/dfernandez/geb/config"
 )
 

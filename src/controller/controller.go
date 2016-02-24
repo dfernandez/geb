@@ -9,6 +9,7 @@ import (
 
 type TplController struct {
 	Template   string
+	Layout     string
 	Controller string
 	Title      string
 	User       string
@@ -17,7 +18,7 @@ type TplController struct {
 
 func (tpl TplController) Render(w http.ResponseWriter, r *http.Request, tplVars interface{}) {
 
-	t, err := template.ParseFiles("layout/layout.html", tpl.Template)
+	t, err := template.ParseFiles(tpl.Layout, tpl.Template)
 	if err != nil {
 		log.Fatal(err)
 	}
