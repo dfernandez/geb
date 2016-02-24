@@ -2,11 +2,12 @@ package controller
 
 import (
 	"net/http"
-	"html/template"
 )
 
-func Error404(t *template.Template, tplData TplData) func(w http.ResponseWriter, r *http.Request) {
+func Error404(tpl *TplController) func(w http.ResponseWriter, r *http.Request) {
+	var tplVars struct{}
+
 	return func(w http.ResponseWriter, r *http.Request) {
-		t.ExecuteTemplate(w, "layout", tplData)
+		tpl.Render(w, r, tplVars)
 	}
 }

@@ -1,0 +1,24 @@
+package config
+
+// Server address
+var SrvAddr  = ":8000"
+
+// Secure cookie
+var HashKey  = []byte("secret-hash-key")
+var BlockKey = []byte("secret-block-key")
+
+// Session name
+var SessionName = "session-name"
+var SessionUser = "username"
+
+// Google OAuth
+var GoogleOAuthConfig = &oauth2.Config{
+	ClientID:     "client-id",
+	ClientSecret: "client-secret",
+	RedirectURL:  "http://localhost:8000/callback",
+	Scopes:       []string{
+		"https://www.googleapis.com/auth/userinfo.email",
+		"https://www.googleapis.com/auth/userinfo.profile",
+	},
+	Endpoint:     google.Endpoint,
+}

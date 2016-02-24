@@ -2,17 +2,18 @@ package server
 
 import (
 	"github.com/gorilla/mux"
-
 	"github.com/dfernandez/geb/controller"
 	"github.com/dfernandez/geb/server/decorator"
 	"net/http"
 	"strings"
+	"github.com/dfernandez/geb/config"
 )
 
 var Router = func() *mux.Router {
 	// decorators
-	logger := decorator.NewLogger()
-	auth   := decorator.NewAuth()
+	auth    := decorator.NewAuth()
+	logger  := decorator.NewLogger()
+	session := decorator.NewSession()
 
 	// router
 	router := mux.NewRouter().StrictSlash(true)
@@ -23,11 +24,19 @@ var Router = func() *mux.Router {
 		return strings.Contains(r.RequestURI, ".")
 	})
 
-	// controllers
-	router.HandleFunc("/",        useHandler(controller.Home(useTemplate("templates/home.html")),       logger))
-	router.HandleFunc("/login",   useHandler(controller.Login(useTemplate("templates/login.html")),     logger))
-	router.HandleFunc("/logout",  useHandler(controller.Logout(),                                       logger))
-	router.HandleFunc("/private", useHandler(controller.Private(useTemplate("templates/private.html")), auth, logger))
+	// home controller
+	router.HandleFunc("/",                        useHandler(controller.Home(useTemplate("templates/home.html")),       session, logger))
+
+	// login controller
+	router.HandleFunc("/login",                   useHandler(controller.Login(useTemplate("templates/login.html")),     session, logger))
+	router.HandleFunc("/login/google",            useHandler(controller.OAuthLogin(config.GoogleOAuthConfig),           session, logger))
+	router.HandleFunc("/login/google/callback",   useHandler(controller.GoogleCallback(config.GoogleOAuthConfig),       session, logger))
+
+	// logout controller
+	router.HandleFunc("/logout",                  useHandler(controller.Logout(),                                       session, logger))
+
+	// profile controller
+	router.HandleFunc("/profile",                 useHandler(controller.Profile(useTemplate("templates/profile.html")), auth, session, logger))
 
 	return router
 }()
