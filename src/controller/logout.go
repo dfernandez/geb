@@ -12,7 +12,7 @@ func Logout() func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		session, _ := store.Get(r, config.SessionName)
 
-		session.Values[config.SessionUser] = nil
+		session.Values["profile"] = nil
 		session.Save(r, w)
 
 		cookie := &http.Cookie{

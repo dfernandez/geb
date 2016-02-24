@@ -6,6 +6,10 @@ import (
 	"github.com/dfernandez/geb/config"
 	"github.com/gorilla/securecookie"
 	"github.com/gorilla/context"
+	"golang.org/x/oauth2"
+	"io/ioutil"
+	"github.com/dfernandez/geb/src/domain"
+	"encoding/json"
 )
 
 type Session struct{}
@@ -21,7 +25,8 @@ func (s Session) Do(h http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		session, _ := store.Get(r, config.SessionName)
 
-		if authorization := session.Values[config.SessionUser]; authorization == nil {
+		var profile domain.Profile
+		if p := session.Values["profile"]; p == nil {
 			cookie, err := r.Cookie("X-Authorization")
 
 			if (err != nil) {
@@ -29,18 +34,28 @@ func (s Session) Do(h http.HandlerFunc) http.HandlerFunc {
 				return;
 			}
 
-			var auth string
-			err = ss.Decode("X-Authorization", cookie.Value, &auth)
+			var token *oauth2.Token
+			err = ss.Decode("X-Authorization", cookie.Value, &token)
 			if err != nil {
 				h(w, r)
 				return;
 			}
-			session.Values[config.SessionUser] = auth
+
+			conf := config.GoogleOAuthConfig
+
+			client      := conf.Client(oauth2.NoContext, token)
+			response, _ := client.Get("https://www.googleapis.com/oauth2/v3/userinfo")
+
+			defer response.Body.Close()
+			body, _ := ioutil.ReadAll(response.Body)
+
+			json.Unmarshal(body, &profile)
+
+			session.Values["profile"] = profile
 			session.Save(r, w)
-			context.Set(r, "User", auth)
-		} else {
-			context.Set(r, "User", authorization)
 		}
+
+		context.Set(r, "profile", profile)
 
 		h(w, r)
 	}

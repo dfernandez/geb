@@ -1,5 +1,10 @@
 package config
 
+import (
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
+)
+
 // Server address
 var SrvAddr  = ":8000"
 
@@ -9,13 +14,12 @@ var BlockKey = []byte("secret-block-key")
 
 // Session name
 var SessionName = "session-name"
-var SessionUser = "username"
 
 // Google OAuth
 var GoogleOAuthConfig = &oauth2.Config{
 	ClientID:     "client-id",
 	ClientSecret: "client-secret",
-	RedirectURL:  "http://localhost:8000/callback",
+	RedirectURL:  "http://localhost:8000/login/google/callback",
 	Scopes:       []string{
 		"https://www.googleapis.com/auth/userinfo.email",
 		"https://www.googleapis.com/auth/userinfo.profile",

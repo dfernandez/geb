@@ -14,7 +14,7 @@ func NewAuth() *Auth {
 
 func (a Auth) Do(h http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if user := context.Get(r, "User"); user == nil {
+		if p := context.Get(r, "profile"); p == nil {
 			http.Redirect(w, r, "/login", http.StatusFound)
 			return
 		}
