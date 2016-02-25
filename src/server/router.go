@@ -28,9 +28,11 @@ var Router = func() *mux.Router {
 	router.HandleFunc("/", useHandler(controller.Home(useTemplate("home.html")), session, logger))
 
 	// login controller
-	router.HandleFunc("/login",                 useHandler(controller.Login(useTemplate("login.html")),         session, logger))
-	router.HandleFunc("/login/google",          useHandler(controller.OAuthLogin(config.GoogleOAuthConfig),     session, logger))
-	router.HandleFunc("/login/google/callback", useHandler(controller.GoogleCallback(config.GoogleOAuthConfig), session, logger))
+	router.HandleFunc("/login",                   useHandler(controller.Login(useTemplate("login.html")),     session, logger))
+	router.HandleFunc("/login/google",            useHandler(controller.OAuthLogin(config.GoogleConfig),      session, logger))
+	router.HandleFunc("/login/google/callback",   useHandler(controller.OAuthCallback(config.GoogleConfig),   session, logger))
+	router.HandleFunc("/login/facebook",          useHandler(controller.OAuthLogin(config.FacebookConfig),    session, logger))
+	router.HandleFunc("/login/facebook/callback", useHandler(controller.OAuthCallback(config.FacebookConfig), session, logger))
 
 	// logout controller
 	router.HandleFunc("/logout", useHandler(controller.Logout(), session, logger))

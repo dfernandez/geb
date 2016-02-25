@@ -6,6 +6,8 @@ import (
 	"github.com/gorilla/securecookie"
 	"github.com/dfernandez/geb/config"
 	"time"
+	"log"
+	"github.com/dfernandez/geb/src/domain"
 )
 
 func Login(tpl *TplController) func(w http.ResponseWriter, r *http.Request) {
@@ -16,25 +18,41 @@ func Login(tpl *TplController) func(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func OAuthLogin(conf *oauth2.Config) func(w http.ResponseWriter, r *http.Request) {
+func OAuthLogin(conf *config.OAuthConfig) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		url := conf.AuthCodeURL("state", oauth2.AccessTypeOffline)
+		url := conf.OAuthConfig.AuthCodeURL("state", oauth2.AccessTypeOffline)
 		http.Redirect(w, r, url, http.StatusFound)
 	}
 }
 
-func GoogleCallback(conf *oauth2.Config) func(w http.ResponseWriter, r *http.Request) {
+func OAuthCallback(conf *config.OAuthConfig) func(w http.ResponseWriter, r *http.Request) {
 	s := securecookie.New(config.HashKey, config.BlockKey)
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		code := r.URL.Query().Get("code");
 		if code == "" {
-			http.Redirect(w, r, "/", http.StatusFound)
+			http.Redirect(w, r, "/login", http.StatusFound)
 			return
 		}
 
-		token, _ := conf.Exchange(oauth2.NoContext, code)
-		encodedValue, err := s.Encode("X-Authorization", token)
+		token, err := conf.OAuthConfig.Exchange(oauth2.NoContext, code)
+		if err != nil {
+			log.Println(err)
+			http.Redirect(w, r, "/login", http.StatusFound)
+			return
+		}
+
+		if conf.Platform == "fb" {
+			conf.ProfileEndpoint += token.Extra("access_token").(string)
+		}
+
+		domainToken := &domain.Token{
+			OAuthToken: token,
+			Platform: conf.Platform,
+			ProfileUrl: conf.ProfileEndpoint,
+		}
+
+		encodedValue, err := s.Encode("X-Authorization", domainToken)
 		if err == nil {
 			cookie := &http.Cookie{
 				Name:  "X-Authorization",
@@ -46,7 +64,7 @@ func GoogleCallback(conf *oauth2.Config) func(w http.ResponseWriter, r *http.Req
 			http.Redirect(w, r, "/profile", http.StatusFound)
 			return
 		} else {
-			http.Redirect(w, r, "/", http.StatusFound)
+			http.Redirect(w, r, "/login", http.StatusFound)
 			return
 		}
 	}

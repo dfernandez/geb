@@ -3,6 +3,7 @@ package config
 import (
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
+	"golang.org/x/oauth2/facebook"
 )
 
 // Server address
@@ -25,4 +26,29 @@ var GoogleOAuthConfig = &oauth2.Config{
 		"https://www.googleapis.com/auth/userinfo.profile",
 	},
 	Endpoint:     google.Endpoint,
+}
+
+var FacebookOAuthConfig = &oauth2.Config{
+	ClientID:     "client-id",
+	ClientSecret: "client-secret",
+	RedirectURL:  "http://localhost:8000/login/facebook/callback",
+	Endpoint:     facebook.Endpoint,
+	Scopes:       []string{"email", "public_profile"},
+}
+
+type OAuthConfig struct {
+	OAuthConfig *oauth2.Config
+	Platform string
+}
+
+var GoogleConfig = &OAuthConfig{
+	OAuthConfig: GoogleOAuthConfig,
+	Platform: "g+",
+	ProfileEndpoint: "https://www.googleapis.com/oauth2/v3/userinfo",
+}
+
+var FacebookConfig = &OAuthConfig{
+	OAuthConfig: FacebookOAuthConfig,
+	Platform: "fb",
+	ProfileEndpoint: "https://graph.facebook.com/me?access_token=",
 }

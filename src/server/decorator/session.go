@@ -16,6 +16,16 @@ import (
 
 type Session struct{}
 
+type facebookProfilePicture struct {
+	ID      string `json:"id"`
+	Picture struct {
+				Data struct {
+						 IsSilhouette bool   `json:"is_silhouette"`
+						 URL          string `json:"url"`
+					 } `json:"data"`
+			} `json:"picture"`
+}
+
 func NewSession() *Session {
 	return &Session{}
 }
@@ -40,17 +50,22 @@ func (s Session) Do(h http.HandlerFunc) http.HandlerFunc {
 				return;
 			}
 
-			var token *oauth2.Token
+			var token *domain.Token
 			err = ss.Decode("X-Authorization", cookie.Value, &token)
 			if err != nil {
 				h(w, r)
 				return;
 			}
 
-			conf := config.GoogleOAuthConfig
+			var conf *oauth2.Config
+			if token.Platform == "g+" {
+				conf = config.GoogleOAuthConfig
+			} else {
+				conf = config.FacebookOAuthConfig
+			}
 
-			client := conf.Client(oauth2.NoContext, token)
-			response, err := client.Get("https://www.googleapis.com/oauth2/v3/userinfo")
+			client := conf.Client(oauth2.NoContext, token.OAuthToken)
+			response, err := client.Get(token.ProfileUrl)
 
 			if err != nil {
 				log.Println(err)
@@ -62,6 +77,18 @@ func (s Session) Do(h http.HandlerFunc) http.HandlerFunc {
 			body, _ := ioutil.ReadAll(response.Body)
 
 			json.Unmarshal(body, &profile)
+
+			// Facebook profile image
+			if token.Platform == "fb" {
+				response, _ = client.Get("https://graph.facebook.com/" + profile.ID + "?fields=picture.type(large)")
+				defer response.Body.Close()
+				body, _ = ioutil.ReadAll(response.Body)
+
+				var profilePicture facebookProfilePicture
+				json.Unmarshal(body, &profilePicture)
+
+				profile.Picture = profilePicture.Picture.Data.URL
+			}
 
 			session.Values["profile"] = profile
 			session.Save(r, w)
