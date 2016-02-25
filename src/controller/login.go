@@ -5,6 +5,7 @@ import (
 	"golang.org/x/oauth2"
 	"github.com/gorilla/securecookie"
 	"github.com/dfernandez/geb/config"
+	"time"
 )
 
 func Login(tpl *TplController) func(w http.ResponseWriter, r *http.Request) {
@@ -17,7 +18,7 @@ func Login(tpl *TplController) func(w http.ResponseWriter, r *http.Request) {
 
 func OAuthLogin(conf *oauth2.Config) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		url := conf.AuthCodeURL("state")
+		url := conf.AuthCodeURL("state", oauth2.AccessTypeOffline)
 		http.Redirect(w, r, url, http.StatusFound)
 	}
 }
@@ -39,6 +40,7 @@ func GoogleCallback(conf *oauth2.Config) func(w http.ResponseWriter, r *http.Req
 				Name:  "X-Authorization",
 				Value: encodedValue,
 				Path:  "/",
+				Expires: time.Now().Add(7 * 24 * time.Hour),
 			}
 			http.SetCookie(w, cookie)
 			http.Redirect(w, r, "/profile", http.StatusFound)
