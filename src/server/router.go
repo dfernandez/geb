@@ -11,6 +11,7 @@ import (
 
 var Router = func() *mux.Router {
 	// decorators
+	admin   := decorator.NewAdmin()
 	auth    := decorator.NewAuth()
 	logger  := decorator.NewLogger()
 	session := decorator.NewSession()
@@ -39,6 +40,10 @@ var Router = func() *mux.Router {
 
 	// profile controller
 	router.HandleFunc("/profile", useHandler(controller.Profile(useTemplate("profile.html")), auth, session, logger))
+
+	// admin
+	router.HandleFunc("/admin",       useHandler(controller.Admin(useTemplate("admin.html")),           admin, session, logger))
+	router.HandleFunc("/admin/users", useHandler(controller.AdminUsers(useTemplate("adminUsers.html")), admin, session, logger))
 
 	return router
 }()

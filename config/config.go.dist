@@ -56,3 +56,6 @@ var FacebookConfig = &OAuthConfig{
 // MongoDB server
 var MongoServer = "localhost"
 var MongoDatabase = "geb"
+
+// Admins
+var Administrators = []string{"admin@example.com"}
