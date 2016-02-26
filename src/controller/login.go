@@ -8,6 +8,7 @@ import (
 	"time"
 	"log"
 	"github.com/dfernandez/geb/src/domain"
+	"github.com/gorilla/sessions"
 )
 
 func Login(tpl *TplController) func(w http.ResponseWriter, r *http.Request) {
@@ -54,6 +55,12 @@ func OAuthCallback(conf *config.OAuthConfig) func(w http.ResponseWriter, r *http
 
 		encodedValue, err := s.Encode("X-Authorization", domainToken)
 		if err == nil {
+			// if doing a callback, delete current session profile
+			store := sessions.NewCookieStore(config.HashKey)
+			session, _ := store.Get(r, config.SessionName)
+			session.Values["profile"] = nil
+			session.Save(r, w)
+
 			cookie := &http.Cookie{
 				Name:  "X-Authorization",
 				Value: encodedValue,
