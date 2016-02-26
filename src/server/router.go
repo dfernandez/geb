@@ -2,11 +2,12 @@ package server
 
 import (
 	"github.com/gorilla/mux"
-	"github.com/dfernandez/geb/src/controller"
-	"github.com/dfernandez/geb/src/server/decorator"
 	"net/http"
 	"strings"
 	"github.com/dfernandez/geb/config"
+	"github.com/dfernandez/geb/src/server/decorator"
+	"github.com/dfernandez/geb/src/controller/backend"
+	"github.com/dfernandez/geb/src/controller/frontend"
 )
 
 var Router = func() *mux.Router {
@@ -18,7 +19,7 @@ var Router = func() *mux.Router {
 
 	// router
 	router := mux.NewRouter().StrictSlash(true)
-	router.NotFoundHandler = useHandler(controller.Error404(useTemplate("error404.html")), logger)
+	router.NotFoundHandler = useHandler(frontend.Error404(useTemplate("error404.html")), logger)
 
 	// static files
 	router.HandleFunc("/{file}", useHandler(serveStatics, logger)).MatcherFunc(func(r *http.Request, rm *mux.RouteMatch) bool {
@@ -26,24 +27,24 @@ var Router = func() *mux.Router {
 	})
 
 	// home controller
-	router.HandleFunc("/", useHandler(controller.Home(useTemplate("home.html")), session, logger))
+	router.HandleFunc("/", useHandler(frontend.Home(useTemplate("home.html")), session, logger))
 
 	// login controller
-	router.HandleFunc("/login",                   useHandler(controller.Login(useTemplate("login.html")),     session, logger))
-	router.HandleFunc("/login/google",            useHandler(controller.OAuthLogin(config.GoogleConfig),      session, logger))
-	router.HandleFunc("/login/google/callback",   useHandler(controller.OAuthCallback(config.GoogleConfig),   session, logger))
-	router.HandleFunc("/login/facebook",          useHandler(controller.OAuthLogin(config.FacebookConfig),    session, logger))
-	router.HandleFunc("/login/facebook/callback", useHandler(controller.OAuthCallback(config.FacebookConfig), session, logger))
+	router.HandleFunc("/login",                   useHandler(frontend.Login(useTemplate("login.html")),     session, logger))
+	router.HandleFunc("/login/google",            useHandler(frontend.OAuthLogin(config.GoogleConfig),      session, logger))
+	router.HandleFunc("/login/google/callback",   useHandler(frontend.OAuthCallback(config.GoogleConfig),   session, logger))
+	router.HandleFunc("/login/facebook",          useHandler(frontend.OAuthLogin(config.FacebookConfig),    session, logger))
+	router.HandleFunc("/login/facebook/callback", useHandler(frontend.OAuthCallback(config.FacebookConfig), session, logger))
 
 	// logout controller
-	router.HandleFunc("/logout", useHandler(controller.Logout(), session, logger))
+	router.HandleFunc("/logout", useHandler(frontend.Logout(), session, logger))
 
 	// profile controller
-	router.HandleFunc("/profile", useHandler(controller.Profile(useTemplate("profile.html")), auth, session, logger))
+	router.HandleFunc("/profile", useHandler(frontend.Profile(useTemplate("profile.html")), auth, session, logger))
 
 	// admin
-	router.HandleFunc("/admin",       useHandler(controller.Admin(useTemplate("admin.html")),           admin, session, logger))
-	router.HandleFunc("/admin/users", useHandler(controller.AdminUsers(useTemplate("adminUsers.html")), admin, session, logger))
+	router.HandleFunc("/admin",       useHandler(backend.Home(useBackendTemplate("home.html")),   admin, session, logger))
+	router.HandleFunc("/admin/users", useHandler(backend.Users(useBackendTemplate("users.html")), admin, session, logger))
 
 	return router
 }()

@@ -1,4 +1,4 @@
-package controller
+package frontend
 
 import (
 	"net/http"
@@ -9,9 +9,10 @@ import (
 	"log"
 	"github.com/dfernandez/geb/src/domain"
 	"github.com/gorilla/sessions"
+	"github.com/dfernandez/geb/src/controller"
 )
 
-func Login(tpl *TplController) func(w http.ResponseWriter, r *http.Request) {
+func Login(tpl *controller.TplController) func(w http.ResponseWriter, r *http.Request) {
 	var tplVars struct{}
 
 	return func(w http.ResponseWriter, r *http.Request) {

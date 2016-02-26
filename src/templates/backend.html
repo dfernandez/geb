@@ -1,0 +1,22 @@
+{{ define "layout" }}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ .Title }}</title>
+
+    <link rel="stylesheet" type="text/css" href="/normalize.css" />
+    <link rel="stylesheet" type="text/css" href="/geb.css" />
+</head>
+<body>
+<p>
+    <a href="/admin">home</a> |
+    <a href="/admin/users">users</a> |
+    {{if .Profile.Email}}<a href="/logout">logout</a> [{{.Profile.Name}}]{{else}}<a href="/login">login</a>{{end}}
+</p>
+<hr />
+
+{{ template "content" .TplVars }}
+
+</body>
+</html>
+{{ end }}

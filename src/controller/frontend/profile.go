@@ -1,12 +1,13 @@
-package controller
+package frontend
 
 import (
 	"net/http"
 	"github.com/dfernandez/geb/src/domain"
 	"github.com/gorilla/context"
+	"github.com/dfernandez/geb/src/controller"
 )
 
-func Profile(tpl *TplController) func(w http.ResponseWriter, r *http.Request) {
+func Profile(tpl *controller.TplController) func(w http.ResponseWriter, r *http.Request) {
 	var tplVars struct {
 		Profile domain.Profile
 	}

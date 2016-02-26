@@ -39,6 +39,7 @@ var FacebookOAuthConfig = &oauth2.Config{
 type OAuthConfig struct {
 	OAuthConfig *oauth2.Config
 	Platform string
+	ProfileEndpoint string
 }
 
 var GoogleConfig = &OAuthConfig{
