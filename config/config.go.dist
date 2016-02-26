@@ -52,3 +52,7 @@ var FacebookConfig = &OAuthConfig{
 	Platform: "fb",
 	ProfileEndpoint: "https://graph.facebook.com/me?access_token=",
 }
+
+// MongoDB server
+var MongoServer = "localhost"
+var MongoDatabase = "geb"

@@ -97,6 +97,8 @@ func (s Session) Do(h http.HandlerFunc) http.HandlerFunc {
 			if err != nil {
 				log.Println(err)
 			}
+
+			profile.UpdateActivity()
 		} else {
 			profile = p.(domain.Profile)
 		}
