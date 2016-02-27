@@ -15,7 +15,7 @@ type Profile struct {
 	Picture string `json:"picture"`
 }
 
-func (p Profile) IsAdmin() bool {
+func (p *Profile) IsAdmin() bool {
 	for _, adm := range config.Administrators {
 		if adm == p.Email {
 			return true

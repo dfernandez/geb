@@ -22,8 +22,8 @@ func (a Admin) Do(h http.HandlerFunc) http.HandlerFunc {
 			http.Redirect(w, r, "/login", http.StatusFound)
 			return
 		}
-
-		if profile.(domain.Profile).IsAdmin() {
+		p := profile.(domain.Profile)
+		if p.IsAdmin() {
 			h(w,r)
 			return
 		}

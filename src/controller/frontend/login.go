@@ -50,6 +50,7 @@ func OAuthCallback(conf *config.OAuthConfig) func(w http.ResponseWriter, r *http
 
 		domainToken := &domain.Token{
 			OAuthToken: token,
+			RefreshToken: token.RefreshToken,
 			Platform: conf.Platform,
 			ProfileUrl: conf.ProfileEndpoint,
 		}

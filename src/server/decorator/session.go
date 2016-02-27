@@ -64,6 +64,8 @@ func (s Session) Do(h http.HandlerFunc) http.HandlerFunc {
 				conf = config.FacebookOAuthConfig
 			}
 
+			token.OAuthToken.RefreshToken = token.RefreshToken
+
 			client := conf.Client(oauth2.NoContext, token.OAuthToken)
 			response, err := client.Get(token.ProfileUrl)
 
