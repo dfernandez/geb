@@ -1,10 +1,9 @@
 package decorator
 
 import (
+	"fmt"
+	log "github.com/Sirupsen/logrus"
 	"net/http"
-	"io"
-	"log"
-	"os"
 	"time"
 )
 
@@ -13,16 +12,13 @@ type Logger struct {
 }
 
 func NewLogger() *Logger {
-	file, _ := os.OpenFile("logs/app.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
-	multi := io.MultiWriter(file, os.Stdout)
-
-	return &Logger{log.New(multi, "", log.LstdFlags)}
+	return &Logger{log.New()}
 }
 
 func (l Logger) Do(h http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		t0 := time.Now()
 		h(w, r)
-		l.Logger.Printf("%s %s %s %s", r.RemoteAddr, r.Method, r.RequestURI, time.Now().Sub(t0).String())
+		l.Logger.Info(fmt.Sprintf("%s %s %s %s", r.RemoteAddr, r.Method, r.RequestURI, time.Now().Sub(t0).String()))
 	}
 }

@@ -1,7 +1,7 @@
 package server
 
 import (
-	"log"
+	log "github.com/Sirupsen/logrus"
 	"net"
 	"net/http"
 	"time"
@@ -28,7 +28,7 @@ func (s Server) Boot() {
 		log.Fatal(err)
 	}
 
-	log.Println("Listening on... ", s.Addr)
+	log.Info("Listening on... ", s.Addr)
 
 	err = srv.Serve(tcpKeepAliveListener{ln.(*net.TCPListener)})
 	if err != nil {

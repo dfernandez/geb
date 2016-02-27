@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"github.com/gorilla/context"
 	"html/template"
-	"log"
+	log "github.com/Sirupsen/logrus"
 	"github.com/dfernandez/geb/src/domain"
 )
 
@@ -34,6 +34,6 @@ func (tpl TplController) Render(w http.ResponseWriter, r *http.Request, tplVars 
 
 	err = t.ExecuteTemplate(w, "layout", tpl)
 	if err != nil {
-		log.Println(err)
+		log.Error(err)
 	}
 }

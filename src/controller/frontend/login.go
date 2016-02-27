@@ -6,7 +6,7 @@ import (
 	"github.com/gorilla/securecookie"
 	"github.com/dfernandez/geb/config"
 	"time"
-	"log"
+	log "github.com/Sirupsen/logrus"
 	"github.com/dfernandez/geb/src/domain"
 	"github.com/gorilla/sessions"
 	"github.com/dfernandez/geb/src/controller"
@@ -39,7 +39,7 @@ func OAuthCallback(conf *config.OAuthConfig) func(w http.ResponseWriter, r *http
 
 		token, err := conf.OAuthConfig.Exchange(oauth2.NoContext, code)
 		if err != nil {
-			log.Println(err)
+			log.Error(err)
 			http.Redirect(w, r, "/login", http.StatusFound)
 			return
 		}

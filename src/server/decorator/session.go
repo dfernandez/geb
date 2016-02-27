@@ -10,7 +10,7 @@ import (
 	"io/ioutil"
 	"github.com/dfernandez/geb/src/domain"
 	"encoding/json"
-	"log"
+	log "github.com/Sirupsen/logrus"
 	"encoding/gob"
 )
 
@@ -19,11 +19,11 @@ type Session struct{}
 type facebookProfilePicture struct {
 	ID      string `json:"id"`
 	Picture struct {
-				Data struct {
-						 IsSilhouette bool   `json:"is_silhouette"`
-						 URL          string `json:"url"`
-					 } `json:"data"`
-			} `json:"picture"`
+		Data struct {
+			IsSilhouette bool   `json:"is_silhouette"`
+			URL          string `json:"url"`
+		 } `json:"data"`
+	} `json:"picture"`
 }
 
 func NewSession() *Session {
@@ -70,7 +70,7 @@ func (s Session) Do(h http.HandlerFunc) http.HandlerFunc {
 			response, err := client.Get(token.ProfileUrl)
 
 			if err != nil {
-				log.Println(err)
+				log.Error(err)
 				h(w, r)
 				return;
 			}
@@ -97,7 +97,7 @@ func (s Session) Do(h http.HandlerFunc) http.HandlerFunc {
 
 			err = store.Save(r, w, session)
 			if err != nil {
-				log.Println(err)
+				log.Error(err)
 			}
 
 			profile.UpdateActivity()
