@@ -22,7 +22,10 @@ func (a Admin) Do(h http.HandlerFunc) http.HandlerFunc {
 			http.Redirect(w, r, "/login", http.StatusFound)
 			return
 		}
-		p := profile.(domain.Profile)
+		prfl := profile.(map[string]interface{})
+		p := domain.Profile{
+			Email: prfl["email"].(string),
+		}
 		if p.IsAdmin() {
 			h(w,r)
 			return

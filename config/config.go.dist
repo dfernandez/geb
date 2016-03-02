@@ -2,8 +2,6 @@ package config
 
 import (
 	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/google"
-	"golang.org/x/oauth2/facebook"
 )
 
 // Server address
@@ -11,51 +9,24 @@ var SrvAddr  = ":8000"
 
 // Secure cookie
 var HashKey  = []byte("secret-hash-key")
-var BlockKey = []byte("secret-block-key")
 
 // Session name
-var SessionName = "session-name"
+var SessionName = "geb-session"
 
 // Google OAuth
-var GoogleOAuthConfig = &oauth2.Config{
+var OAuthConfig = &oauth2.Config{
 	ClientID:     "client-id",
 	ClientSecret: "client-secret",
-	RedirectURL:  "http://localhost:8000/login/google/callback",
-	Scopes:       []string{
-		"https://www.googleapis.com/auth/userinfo.email",
-		"https://www.googleapis.com/auth/userinfo.profile",
+	RedirectURL:  "http://<domain>/login/callback",
+	Scopes:       []string{"openid", "name", "email", "nickname"},
+	Endpoint: oauth2.Endpoint{
+		AuthURL:  "https://<auth0-domain>/authorize",
+		TokenURL: "https://<auth0-domain>/oauth/token",
 	},
-	Endpoint:     google.Endpoint,
-}
-
-var FacebookOAuthConfig = &oauth2.Config{
-	ClientID:     "client-id",
-	ClientSecret: "client-secret",
-	RedirectURL:  "http://localhost:8000/login/facebook/callback",
-	Endpoint:     facebook.Endpoint,
-	Scopes:       []string{"email", "public_profile"},
-}
-
-type OAuthConfig struct {
-	OAuthConfig *oauth2.Config
-	Platform string
-	ProfileEndpoint string
-}
-
-var GoogleConfig = &OAuthConfig{
-	OAuthConfig: GoogleOAuthConfig,
-	Platform: "g+",
-	ProfileEndpoint: "https://www.googleapis.com/oauth2/v3/userinfo",
-}
-
-var FacebookConfig = &OAuthConfig{
-	OAuthConfig: FacebookOAuthConfig,
-	Platform: "fb",
-	ProfileEndpoint: "https://graph.facebook.com/me?access_token=",
 }
 
 // MongoDB server
-var MongoServer = "localhost"
+var MongoServer   = "localhost"
 var MongoDatabase = "geb"
 
 // Admins

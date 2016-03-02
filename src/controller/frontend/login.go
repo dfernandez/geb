@@ -3,13 +3,13 @@ package frontend
 import (
 	"net/http"
 	"golang.org/x/oauth2"
-	"github.com/gorilla/securecookie"
 	"github.com/dfernandez/geb/config"
-	"time"
 	log "github.com/Sirupsen/logrus"
-	"github.com/dfernandez/geb/src/domain"
 	"github.com/gorilla/sessions"
 	"github.com/dfernandez/geb/src/controller"
+	"io/ioutil"
+	"encoding/json"
+	"encoding/gob"
 )
 
 func Login(tpl *controller.TplController) func(w http.ResponseWriter, r *http.Request) {
@@ -20,61 +20,88 @@ func Login(tpl *controller.TplController) func(w http.ResponseWriter, r *http.Re
 	}
 }
 
-func OAuthLogin(conf *config.OAuthConfig) func(w http.ResponseWriter, r *http.Request) {
+func Logout() func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		url := conf.OAuthConfig.AuthCodeURL("state", oauth2.AccessTypeOffline)
-		http.Redirect(w, r, url, http.StatusFound)
+		cookie := &http.Cookie{
+			Name:   config.SessionName,
+			Path:   "/",
+			MaxAge: -1,
+		}
+
+		http.SetCookie(w, cookie)
+		http.Redirect(w, r, "/", http.StatusFound)
 	}
 }
 
-func OAuthCallback(conf *config.OAuthConfig) func(w http.ResponseWriter, r *http.Request) {
-	s := securecookie.New(config.HashKey, config.BlockKey)
+func Callback() func(w http.ResponseWriter, r *http.Request) {
+	conf  := config.OAuthConfig
+	store := sessions.NewCookieStore(config.HashKey)
+	store.MaxAge(0)
+
+	gob.Register(map[string]interface{}{})
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		code := r.URL.Query().Get("code");
-		if code == "" {
-			http.Redirect(w, r, "/login", http.StatusFound)
-			return
-		}
+		// Getting the Code that we got from Auth0
+		code := r.URL.Query().Get("code")
 
-		token, err := conf.OAuthConfig.Exchange(oauth2.NoContext, code)
+		// Exchanging the code for a token
+		token, err := conf.Exchange(oauth2.NoContext, code)
 		if err != nil {
 			log.Error(err)
 			http.Redirect(w, r, "/login", http.StatusFound)
 			return
 		}
 
-		if conf.Platform == "fb" {
-			conf.ProfileEndpoint += token.Extra("access_token").(string)
-		}
-
-		domainToken := &domain.Token{
-			OAuthToken: token,
-			RefreshToken: token.RefreshToken,
-			Platform: conf.Platform,
-			ProfileUrl: conf.ProfileEndpoint,
-		}
-
-		encodedValue, err := s.Encode("X-Authorization", domainToken)
-		if err == nil {
-			// if doing a callback, delete current session profile
-			store := sessions.NewCookieStore(config.HashKey)
-			session, _ := store.Get(r, config.SessionName)
-			session.Values["profile"] = nil
-			session.Save(r, w)
-
-			cookie := &http.Cookie{
-				Name:  "X-Authorization",
-				Value: encodedValue,
-				Path:  "/",
-				Expires: time.Now().Add(7 * 24 * time.Hour),
-			}
-			http.SetCookie(w, cookie)
-			http.Redirect(w, r, "/profile", http.StatusFound)
-			return
-		} else {
+		// Getting now the User information
+		client := conf.Client(oauth2.NoContext, token)
+		resp, err := client.Get("https://web83-es.eu.auth0.com/userinfo")
+		if err != nil {
+			log.Error(err)
 			http.Redirect(w, r, "/login", http.StatusFound)
 			return
 		}
+
+		// Reading the body
+		raw, err := ioutil.ReadAll(resp.Body)
+		defer resp.Body.Close()
+		if err != nil {
+			log.Error(err)
+			http.Redirect(w, r, "/login", http.StatusFound)
+			return
+		}
+
+		// Unmarshalling the JSON of the Profile
+		var profile map[string]interface{}
+		if err := json.Unmarshal(raw, &profile); err != nil {
+			log.Error(err)
+			http.Redirect(w, r, "/login", http.StatusFound)
+			return
+		}
+
+		// Facebook profile picture fix
+		identities := profile["identities"].([]interface{})[0].(map[string]interface{})
+		if identities["provider"] == "facebook" {
+			profile["picture"] = "https://graph.facebook.com/" + identities["user_id"].(string) + "/picture?width=100&height=100"
+		}
+
+		// Saving the information to the session.
+		var session, _ = store.Get(r, config.SessionName)
+		session.Options.MaxAge         = 0
+		session.Values["access_token"] = token.AccessToken
+		session.Values["profile"]      = map[string]interface{}{
+			"name":    profile["name"],
+			"email":   profile["email"],
+			"locale":  profile["locale"],
+			"picture": profile["picture"],
+		}
+
+		session.Save(r, w)
+		err = store.Save(r, w, session)
+		if err != nil {
+			log.Error(err)
+		}
+
+		// Redirect to logged in page
+		http.Redirect(w, r, "/profile", http.StatusMovedPermanently)
 	}
 }

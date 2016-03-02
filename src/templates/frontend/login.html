@@ -1,3 +1,16 @@
 {{ define "content" }}
-<a href="/login/google">Google</a> | <a href="/login/facebook">Facebook</a>
+
+<script src="https://cdn.auth0.com/js/lock-8.2.min.js"></script>
+<script type="text/javascript">
+    var lock = new Auth0Lock('wneopuiGCXW0ZqNJGPy3i8p4M4mtAgwS', 'web83-es.eu.auth0.com');
+
+    lock.show({
+        callbackURL: 'http://localhost:8000/login/callback',
+        responseType: 'code',
+        authParams: {
+            scope: 'openid profile',
+        },
+    });
+</script>
+
 {{ end }}
