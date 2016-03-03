@@ -17,27 +17,15 @@ type Profile struct {
 }
 
 func NewProfile(name string, email string, locale string, picture string) *Profile {
-	p := &Profile{
+	return &Profile{
 		Name:    name,
 		Email:   email,
 		Locale:  locale,
 		Picture: picture,
 	}
-	p.Init()
-
-	return p
 }
 
-func (p *Profile) Init() {
-	session, err := mgo.Dial(config.MongoServer)
-	if err != nil {
-		panic(err)
-	}
-	defer session.Close()
-
-	// Optional. Switch the session to a monotonic behavior.
-	session.SetMode(mgo.Monotonic, true)
-
+func (p *Profile) Init(session *mgo.Session) {
 	var profile Profile
 	c := session.DB(config.MongoDatabase).C("profiles")
 	c.FindId(p.Email).One(&profile)
@@ -51,19 +39,11 @@ func (p *Profile) IsAdmin() bool {
 			return true
 		}
 	}
+
 	return false
 }
 
-func (p *Profile) GetProfiles() []Profile {
-	session, err := mgo.Dial(config.MongoServer)
-	if err != nil {
-		panic(err)
-	}
-	defer session.Close()
-
-	// Optional. Switch the session to a monotonic behavior.
-	session.SetMode(mgo.Monotonic, true)
-
+func (p *Profile) GetProfiles(session *mgo.Session) []Profile {
 	var profiles []Profile
 	c := session.DB(config.MongoDatabase).C("profiles")
 	c.Find(bson.M{}).All(&profiles)
@@ -71,27 +51,18 @@ func (p *Profile) GetProfiles() []Profile {
 	return profiles
 }
 
-func (p *Profile) UpdateActivity() {
+func (p *Profile) UpdateActivity(session *mgo.Session) {
 	p.LastLoginTs = time.Now()
-	p.save()
+	p.save(session)
 }
 
 func (p *Profile) LastLogin() string {
 	return p.LastLoginTs.Format(time.RFC822)
 }
 
-func (p *Profile) save() {
-	session, err := mgo.Dial(config.MongoServer)
-	if err != nil {
-		panic(err)
-	}
-	defer session.Close()
-
-	// Optional. Switch the session to a monotonic behavior.
-	session.SetMode(mgo.Monotonic, true)
-
+func (p *Profile) save(session *mgo.Session) {
 	c := session.DB(config.MongoDatabase).C("profiles")
-	_, err = c.UpsertId(p.Email, p)
+	_, err := c.UpsertId(p.Email, p)
 	if err != nil {
 		log.Fatal(err)
 	}

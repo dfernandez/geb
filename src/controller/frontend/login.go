@@ -11,6 +11,8 @@ import (
 	"encoding/json"
 	"encoding/gob"
 	"github.com/dfernandez/geb/src/domain"
+	"github.com/gorilla/context"
+	"gopkg.in/mgo.v2"
 )
 
 func Login(tpl *controller.TplController) func(w http.ResponseWriter, r *http.Request) {
@@ -85,12 +87,14 @@ func Callback() func(w http.ResponseWriter, r *http.Request) {
 			profile["picture"] = "https://graph.facebook.com/" + identities["user_id"].(string) + "/picture?width=100&height=100"
 		}
 
+		mongoSession := context.Get(r, "mongoDB")
 		// User profile
 		p := domain.NewProfile(
 			profile["name"].(string),
 			profile["email"].(string),
 			profile["locale"].(string),
 			profile["picture"].(string))
+		p.Init(mongoSession.(*mgo.Session))
 
 		// Saving the information to the session.
 		var session, _ = store.Get(r, config.SessionName)
@@ -104,7 +108,7 @@ func Callback() func(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Update last login
-		p.UpdateActivity()
+		p.UpdateActivity(mongoSession.(*mgo.Session))
 
 		// Redirect to logged in page
 		http.Redirect(w, r, "/profile", http.StatusMovedPermanently)

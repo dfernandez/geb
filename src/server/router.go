@@ -11,8 +11,9 @@ import (
 
 var Router = func() *mux.Router {
 	// decorators
-	admin   := decorator.NewAdmin()
-	auth    := decorator.NewAuth()
+	admin := decorator.NewAdmin()
+	auth  := decorator.NewAuth()
+	mongo := decorator.NewMongo()
 
 	// router
 	router := mux.NewRouter().StrictSlash(true)
@@ -28,7 +29,7 @@ var Router = func() *mux.Router {
 
 	// login controller
 	router.HandleFunc("/login",          useHandler(frontend.Login(useTemplate("login.html"))))
-	router.HandleFunc("/login/callback", useHandler(frontend.Callback()))
+	router.HandleFunc("/login/callback", useHandler(frontend.Callback(), mongo))
 
 	// logout controller
 	router.HandleFunc("/logout", useHandler(frontend.Logout()))
@@ -38,7 +39,7 @@ var Router = func() *mux.Router {
 
 	// admin
 	router.HandleFunc("/admin",       useHandler(backend.Home(useBackendTemplate("home.html")),   admin))
-	router.HandleFunc("/admin/users", useHandler(backend.Users(useBackendTemplate("users.html")), admin))
+	router.HandleFunc("/admin/users", useHandler(backend.Users(useBackendTemplate("users.html")), admin, mongo))
 
 	return router
 }()
