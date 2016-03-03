@@ -1,8 +1,13 @@
 {{ define "content" }}
 <table>
+    <tr>
+        <th>Email</th>
+        <th>Last login</th>
+    </tr>
     {{ range $profile := .Profiles }}
     <tr>
         <td>{{ $profile.Email }}</td>
+        <td>{{ $profile.LastLogin }}</td>
     </tr>
     {{ end }}
 </table>

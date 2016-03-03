@@ -5,6 +5,7 @@ import (
 	"github.com/gorilla/context"
 	"html/template"
 	log "github.com/Sirupsen/logrus"
+	"github.com/dfernandez/geb/src/domain"
 )
 
 type TplController struct {
@@ -12,7 +13,7 @@ type TplController struct {
 	Layout     string
 	Controller string
 	Title      string
-	Profile    map[string]interface{}
+	Profile    domain.Profile
 	TplVars    interface{}
 }
 
@@ -28,7 +29,7 @@ func (tpl TplController) Render(w http.ResponseWriter, r *http.Request, tplVars 
 	tpl.TplVars    = tplVars
 
 	if profile := context.Get(r, "profile"); profile != nil {
-		tpl.Profile = profile.(map[string]interface{})
+		tpl.Profile = profile.(domain.Profile)
 	}
 
 	err = t.ExecuteTemplate(w, "layout", tpl)

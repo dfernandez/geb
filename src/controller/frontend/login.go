@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"encoding/json"
 	"encoding/gob"
+	"github.com/dfernandez/geb/src/domain"
 )
 
 func Login(tpl *controller.TplController) func(w http.ResponseWriter, r *http.Request) {
@@ -38,7 +39,7 @@ func Callback() func(w http.ResponseWriter, r *http.Request) {
 	store := sessions.NewCookieStore(config.HashKey)
 	store.MaxAge(0)
 
-	gob.Register(map[string]interface{}{})
+	gob.Register(domain.Profile{})
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Getting the Code that we got from Auth0
@@ -84,22 +85,26 @@ func Callback() func(w http.ResponseWriter, r *http.Request) {
 			profile["picture"] = "https://graph.facebook.com/" + identities["user_id"].(string) + "/picture?width=100&height=100"
 		}
 
+		// User profile
+		p := domain.NewProfile(
+			profile["name"].(string),
+			profile["email"].(string),
+			profile["locale"].(string),
+			profile["picture"].(string))
+
 		// Saving the information to the session.
 		var session, _ = store.Get(r, config.SessionName)
 		session.Options.MaxAge         = 0
-		session.Values["access_token"] = token.AccessToken
-		session.Values["profile"]      = map[string]interface{}{
-			"name":    profile["name"],
-			"email":   profile["email"],
-			"locale":  profile["locale"],
-			"picture": profile["picture"],
-		}
+		session.Values["profile"]      = p
 
 		session.Save(r, w)
 		err = store.Save(r, w, session)
 		if err != nil {
 			log.Error(err)
 		}
+
+		// Update last login
+		p.UpdateActivity()
 
 		// Redirect to logged in page
 		http.Redirect(w, r, "/profile", http.StatusMovedPermanently)
