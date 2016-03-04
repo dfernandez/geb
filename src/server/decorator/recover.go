@@ -1,35 +1,35 @@
 package decorator
 
 import (
-	log "github.com/Sirupsen/logrus"
-	"net/http"
-	"errors"
+    log "github.com/Sirupsen/logrus"
+    "net/http"
+    "errors"
 )
 
 type Recover struct {
 }
 
 func NewRecover() *Recover {
-	return &Recover{}
+    return &Recover{}
 }
 
 func (e Recover) Do(h http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		defer func() {
-			if rcv := recover(); rcv != nil {
-				var err error
-				switch t := rcv.(type) {
-					case string:
-						err = errors.New(t)
-					case error:
-						err = t
-					default:
-						err = errors.New("Unknown error")
-				}
-				log.Error(err.Error())
-			}
-		}()
+    return func(w http.ResponseWriter, r *http.Request) {
+        defer func() {
+            if rcv := recover(); rcv != nil {
+                var err error
+                switch t := rcv.(type) {
+                    case string:
+                        err = errors.New(t)
+                    case error:
+                        err = t
+                    default:
+                        err = errors.New("Unknown error")
+                }
+                log.Error(err.Error())
+            }
+        }()
 
-		h(w, r)
-	}
+        h(w, r)
+    }
 }
