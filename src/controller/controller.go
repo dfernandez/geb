@@ -19,20 +19,23 @@ type TplController struct {
 
 func (tpl TplController) Render(w http.ResponseWriter, r *http.Request, tplVars interface{}) {
 
-	t, err := template.ParseFiles(tpl.Layout, tpl.Template)
-	if err != nil {
-		log.Fatal(err)
+	funcMap := template.FuncMap{
+		"add": func(x int, y int) int {
+			return x + y
+		},
 	}
 
+	t := template.Must(template.New("").Funcs(funcMap).ParseFiles(tpl.Layout, tpl.Template))
+
 	tpl.Title      = "Go web!"
-	tpl.Controller = r.URL.Path
 	tpl.TplVars    = tplVars
+	tpl.Controller = r.URL.Path
 
 	if profile := context.Get(r, "profile"); profile != nil {
 		tpl.Profile = profile.(domain.Profile)
 	}
 
-	err = t.ExecuteTemplate(w, "layout", tpl)
+	err := t.ExecuteTemplate(w, "layout", tpl)
 	if err != nil {
 		log.Error(err)
 	}

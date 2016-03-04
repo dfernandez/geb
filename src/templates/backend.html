@@ -2,20 +2,45 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <title>{{ .Title }}</title>
 
-    <link rel="stylesheet" type="text/css" href="/normalize.css" />
-    <link rel="stylesheet" type="text/css" href="/geb.css" />
+    <link rel="stylesheet" href="/bootstrap.min.css" />
+    <script type="text/javascript" src="/bootstrap.min.js"></script>
+
+    <style type="text/css">
+        body {
+            padding-top: 50px;
+        }
+    </style>
 </head>
 <body>
-<p>
-    <a href="/admin">home</a> |
-    <a href="/admin/users">users</a> |
-    {{if .Profile.Email}}<a href="/logout">logout</a> [{{.Profile.Name}}]{{else}}<a href="/login">login</a>{{end}}
-</p>
-<hr />
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">{{.Title}}</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li {{if eq .Controller "/admin"}}class="active"{{end}}><a href="/admin">Home</a></li>
+                <li {{if eq .Controller "/admin/users"}}class="active"{{end}}><a href="/admin/users">Users</a></li>
+                <li><a href="/logout">Logout</a></li>
+                <li><p class="navbar-text">[{{.Profile.Name}}]</p></li>
+            </ul>
+        </div>
+    </nav>
 
-{{ template "content" .TplVars }}
+    <div class="container">
+        {{ template "content" .TplVars }}
+    </div>
 
 </body>
 </html>
