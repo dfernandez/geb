@@ -10,7 +10,7 @@ import (
 	"io/ioutil"
 	"encoding/json"
 	"encoding/gob"
-	"github.com/dfernandez/geb/src/domain"
+	"github.com/dfernandez/geb/src/models/user"
 	"github.com/gorilla/context"
 	"gopkg.in/mgo.v2"
 )
@@ -41,7 +41,7 @@ func Callback() func(w http.ResponseWriter, r *http.Request) {
 	store := sessions.NewCookieStore(config.HashKey)
 	store.MaxAge(0)
 
-	gob.Register(domain.Profile{})
+	gob.Register(user.User{})
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Getting the Code that we got from Auth0
@@ -88,18 +88,19 @@ func Callback() func(w http.ResponseWriter, r *http.Request) {
 		}
 
 		mongoSession := context.Get(r, "mongoDB")
+
 		// User profile
-		p := domain.NewProfile(
+		u := user.NewUser(
 			profile["name"].(string),
 			profile["email"].(string),
 			profile["locale"].(string),
 			profile["picture"].(string))
-		p.Init(mongoSession.(*mgo.Session))
+		u.Init(mongoSession.(*mgo.Session))
 
 		// Saving the information to the session.
 		var session, _ = store.Get(r, config.SessionName)
 		session.Options.MaxAge         = 0
-		session.Values["profile"]      = p
+		session.Values["user"]      = u
 
 		session.Save(r, w)
 		err = store.Save(r, w, session)
@@ -108,7 +109,7 @@ func Callback() func(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Update last login
-		p.UpdateActivity(mongoSession.(*mgo.Session))
+		u.UpdateActivity(mongoSession.(*mgo.Session))
 
 		// Redirect to logged in page
 		http.Redirect(w, r, "/profile", http.StatusMovedPermanently)

@@ -4,17 +4,17 @@ import (
 	"net/http"
 	"github.com/gorilla/context"
 	"github.com/dfernandez/geb/src/controller"
-	"github.com/dfernandez/geb/src/domain"
+	"github.com/dfernandez/geb/src/models/user"
 )
 
 func Profile(tpl *controller.TplController) func(w http.ResponseWriter, r *http.Request) {
 	var tplVars struct {
-		Profile *domain.Profile
+		Profile *user.User
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		p := context.Get(r, "profile").(domain.Profile)
-		tplVars.Profile = &p
+		u := context.Get(r, "user").(user.User)
+		tplVars.Profile = &u
 		tpl.Render(w, r, tplVars)
 	}
 }

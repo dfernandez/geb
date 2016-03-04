@@ -1,5 +1,7 @@
 {{ define "content" }}
 <p>{{ .Profile.Name }}</p>
 <img src="{{ .Profile.Picture }}" width="100px" />
+{{ if .Profile.LastLogin }}
 <p>Last login: {{ .Profile.LastLogin }}</p>
+{{ end }}
 {{ end }}

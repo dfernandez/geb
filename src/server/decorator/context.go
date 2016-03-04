@@ -19,7 +19,7 @@ func (c Context) Do(h http.HandlerFunc) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		session, _ := store.Get(r, config.SessionName)
-		context.Set(r, "profile", session.Values["profile"])
+		context.Set(r, "user", session.Values["user"])
 
 		h(w, r)
 	}

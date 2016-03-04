@@ -3,7 +3,7 @@ package decorator
 import (
 	"net/http"
 	"github.com/gorilla/context"
-	"github.com/dfernandez/geb/src/domain"
+	"github.com/dfernandez/geb/src/models/user"
 	"github.com/dfernandez/geb/config"
 )
 
@@ -17,14 +17,14 @@ func NewAdmin() *Admin {
 
 func (a Admin) Do(h http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		profile := context.Get(r, "profile")
-		if profile == nil {
+		u := context.Get(r, "user")
+		if u == nil {
 			http.Redirect(w, r, "/login", http.StatusFound)
 			return
 		}
 
-		p := profile.(domain.Profile)
-		if p.IsAdmin() {
+		user := u.(user.User)
+		if user.IsAdmin() {
 			h(w,r)
 			return
 		}
