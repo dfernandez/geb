@@ -2,6 +2,7 @@
 <table class="table">
     <tr>
         <th>#</th>
+        <th>Name</th>
         <th>Email</th>
         <th>Last login</th>
         <th>Registration</th>
@@ -9,6 +10,7 @@
     {{ range $index, $profile := .Profiles }}
     <tr>
         <td>{{ add $index 1 }}</td>
+        <td>{{ $profile.Name }}</td>
         <td>{{ $profile.Email }}</td>
         <td>{{ $profile.LastLogin }}</td>
         <td>{{ $profile.Registration }}</td>
