@@ -13,6 +13,7 @@ type httpHandlerDecorator interface {
 func useHandler(h http.HandlerFunc, decors ...httpHandlerDecorator) http.HandlerFunc {
 	context := decorator.NewContext()
 	logger  := decorator.NewLogger()
+	recover := decorator.NewRecover()
 
 	n        := len(decors)
 	handlers := make(map[int]httpHandlerDecorator, (n + 3))
@@ -29,7 +30,8 @@ func useHandler(h http.HandlerFunc, decors ...httpHandlerDecorator) http.Handler
 	}
 
 	handlers[(n+1)] = context
-	handlers[(n+3)] = logger
+	handlers[(n+2)] = logger
+	handlers[(n+3)] = recover
 
 	var keys []int
 	for k := range handlers {

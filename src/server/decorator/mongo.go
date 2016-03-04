@@ -22,8 +22,8 @@ func (m Mongo) Do(h http.HandlerFunc) http.HandlerFunc {
 		}
 
 		session.SetMode(mgo.Monotonic, true)
-
 		context.Set(r, "mongoDB", session)
+
 		h(w, r)
 
 		session.Close()
