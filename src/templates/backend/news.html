@@ -1,0 +1,23 @@
+{{ define "content" }}
+<p class="pull-right"><a href="/admin/news/create" class="btn btn-success">create</a></p>
+<table class="table">
+    <tr>
+        <th>#</th>
+        <th>Title</th>
+        <th>Author</th>
+        <th>Created</th>
+        <th>Edited</th>
+        <th>&nbsp;</th>
+    </tr>
+    {{ range $index, $news := .News }}
+    <tr>
+        <td>{{ add $index 1 }}</td>
+        <td>{{ $news.Title }}</td>
+        <td>{{ $news.Author.Email }}</td>
+        <td>{{ $news.Created }}</td>
+        <td>{{ $news.Edited }}</td>
+        <td><a class="pull-right btn btn-danger btn-xs" href="/admin/news/delete/{{ $news.Id.Hex }}"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></a></td>
+    </tr>
+    {{ end }}
+</table>
+{{ end }}

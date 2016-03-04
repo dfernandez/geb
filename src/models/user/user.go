@@ -1,7 +1,7 @@
 package user
 
 import (
-    "log"
+    log "github.com/Sirupsen/logrus"
     "gopkg.in/mgo.v2"
     "gopkg.in/mgo.v2/bson"
     "github.com/dfernandez/geb/config"
@@ -87,6 +87,6 @@ func (p *User) save(session *mgo.Session) {
     c := session.DB(config.MongoDatabase).C("users")
     _, err := c.UpsertId(p.Email, p)
     if err != nil {
-        log.Fatal(err)
+        log.Error(err)
     }
 }
