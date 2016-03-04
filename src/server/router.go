@@ -19,10 +19,15 @@ var Router = func() *mux.Router {
     router := mux.NewRouter().StrictSlash(true)
     router.NotFoundHandler = useHandler(frontend.Error404(useTemplate("error404.html")))
 
-    // static files
-    router.HandleFunc("/{file}", useHandler(serveStatics)).MatcherFunc(func(r *http.Request, rm *mux.RouteMatch) bool {
+    matcherFunc := func(r *http.Request, rm *mux.RouteMatch) bool {
         return strings.Contains(r.RequestURI, ".")
-    })
+    }
+
+    // static files
+    router.HandleFunc("/{file}",       useHandler(serveStatics("/"))).MatcherFunc(matcherFunc)
+    router.HandleFunc("/css/{file}",   useHandler(serveStatics("/css/"))).MatcherFunc(matcherFunc)
+    router.HandleFunc("/fonts/{file}", useHandler(serveStatics("/fonts/"))).MatcherFunc(matcherFunc)
+    router.HandleFunc("/js/{file}",    useHandler(serveStatics("/js/"))).MatcherFunc(matcherFunc)
 
     // home controller
     router.HandleFunc("/", useHandler(frontend.Home(useTemplate("home.html"))))
@@ -44,9 +49,11 @@ var Router = func() *mux.Router {
     return router
 }()
 
-func serveStatics(w http.ResponseWriter, r *http.Request) {
-    vars := mux.Vars(r)
-    file := vars["file"]
+func serveStatics(path string) http.HandlerFunc {
+    return func(w http.ResponseWriter, r *http.Request) {
+        vars := mux.Vars(r)
+        file := vars["file"]
 
-    http.ServeFile(w, r, "./public/" + file)
+        http.ServeFile(w, r, "./public" + path + file)
+    }
 }
