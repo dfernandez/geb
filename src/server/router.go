@@ -38,7 +38,7 @@ var Router = func() *mux.Router {
 	router.HandleFunc("/profile", useHandler(frontend.Profile(useTemplate("profile.html")), auth))
 
 	// admin
-	router.HandleFunc("/admin",       useHandler(backend.Home(useBackendTemplate("home.html")),   admin))
+	router.HandleFunc("/admin",       useHandler(backend.Home(useBackendTemplate("home.html")),   admin, mongo))
 	router.HandleFunc("/admin/users", useHandler(backend.Users(useBackendTemplate("users.html")), admin, mongo))
 
 	return router

@@ -15,8 +15,7 @@ func Users(tpl *controller.TplController) func(w http.ResponseWriter, r *http.Re
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		mongoSession := context.Get(r, "mongoDB")
-		p := &domain.Profile{}
-		tplVars.Profiles = p.GetProfiles(mongoSession.(*mgo.Session))
+		tplVars.Profiles = domain.Profiles(mongoSession.(*mgo.Session))
 
 		tpl.Render(w, r, tplVars)
 	}

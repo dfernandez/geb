@@ -16,6 +16,21 @@ type Profile struct {
 	LastLoginTs time.Time
 }
 
+func Count(session *mgo.Session) int {
+	c := session.DB(config.MongoDatabase).C("profiles")
+	count, _ := c.Find(bson.M{}).Count()
+
+	return count
+}
+
+func Profiles(session *mgo.Session) []Profile {
+	var profiles []Profile
+	c := session.DB(config.MongoDatabase).C("profiles")
+	c.Find(bson.M{}).All(&profiles)
+
+	return profiles
+}
+
 func NewProfile(name string, email string, locale string, picture string) *Profile {
 	return &Profile{
 		Name:    name,
@@ -41,14 +56,6 @@ func (p *Profile) IsAdmin() bool {
 	}
 
 	return false
-}
-
-func (p *Profile) GetProfiles(session *mgo.Session) []Profile {
-	var profiles []Profile
-	c := session.DB(config.MongoDatabase).C("profiles")
-	c.Find(bson.M{}).All(&profiles)
-
-	return profiles
 }
 
 func (p *Profile) UpdateActivity(session *mgo.Session) {
