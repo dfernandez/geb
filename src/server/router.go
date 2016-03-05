@@ -30,25 +30,25 @@ var Router = func() *mux.Router {
     router.HandleFunc("/js/{file}",    useHandler(serveStatics("/js/"))).MatcherFunc(matcherFunc)
 
     // home controller
-    router.HandleFunc("/", useHandler(frontend.Home(useTemplate("home.html"))))
+    router.HandleFunc("/", useHandler(frontend.Home(useTemplate("home/home.html"))))
 
     // login controller
-    router.HandleFunc("/login",          useHandler(frontend.Login(useTemplate("login.html"))))
+    router.HandleFunc("/login",          useHandler(frontend.Login(useTemplate("login/login.html"))))
     router.HandleFunc("/login/callback", useHandler(frontend.Callback(), mongo))
 
     // logout controller
     router.HandleFunc("/logout", useHandler(frontend.Logout()))
 
     // profile controller
-    router.HandleFunc("/profile", useHandler(frontend.Profile(useTemplate("profile.html")), auth))
+    router.HandleFunc("/profile", useHandler(frontend.Profile(useTemplate("profile/profile.html")), auth))
 
     // admin
-    router.HandleFunc("/admin",                  useHandler(backend.Home(useBackendTemplate("home.html")),             admin, mongo))
-    router.HandleFunc("/admin/users",            useHandler(backend.Users(useBackendTemplate("users.html")),           admin, mongo))
-    router.HandleFunc("/admin/news",             useHandler(backend.News(useBackendTemplate("news.html")),             admin, mongo))
-    router.HandleFunc("/admin/news/create",      useHandler(backend.NewsCreate(useBackendTemplate("newsCreate.html")), admin))
-    router.HandleFunc("/admin/news/save",        useHandler(backend.NewsSave(),                                        admin, mongo))
-    router.HandleFunc("/admin/news/delete/{id}", useHandler(backend.NewsDelete(),                                      admin, mongo))
+    router.HandleFunc("/admin",                  useHandler(backend.Home(useBackendTemplate("home/home.html")),         admin, mongo))
+    router.HandleFunc("/admin/users",            useHandler(backend.Users(useBackendTemplate("users/users.html")),      admin, mongo))
+    router.HandleFunc("/admin/news",             useHandler(backend.News(useBackendTemplate("news/news.html")),         admin, mongo))
+    router.HandleFunc("/admin/news/create",      useHandler(backend.NewsCreate(useBackendTemplate("news/create.html")), admin))
+    router.HandleFunc("/admin/news/save",        useHandler(backend.NewsSave(),                                         admin, mongo))
+    router.HandleFunc("/admin/news/delete/{id}", useHandler(backend.NewsDelete(),                                       admin, mongo))
 
     return router
 }()
