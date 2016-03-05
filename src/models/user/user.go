@@ -9,6 +9,7 @@ import (
 )
 
 type User struct {
+    Id             bson.ObjectId `json:"id" bson:"_id,omitempty"`
     Name           string `json:"name"`
     Email          string `json:"email"`
     Locale         string `json:"locale"`
@@ -44,7 +45,7 @@ func NewUser(name string, email string, locale string, picture string) *User {
 func (p *User) Init(session *mgo.Session) {
     var user User
     c := session.DB(config.MongoDatabase).C("users")
-    err := c.FindId(p.Email).One(&user)
+    err := c.Find(bson.M{"email": p.Email}).One(&user)
 
     // Non-existent user
     if err != nil {
@@ -52,6 +53,7 @@ func (p *User) Init(session *mgo.Session) {
         return
     }
 
+    p.Id             = user.Id
     p.LastLoginTs    = user.LastLoginTs
     p.RegistrationTs = user.RegistrationTs
 }
@@ -85,7 +87,7 @@ func (p *User) Registration() string {
 
 func (p *User) save(session *mgo.Session) {
     c := session.DB(config.MongoDatabase).C("users")
-    _, err := c.UpsertId(p.Email, p)
+    _, err := c.Upsert(bson.M{"email": p.Email}, p)
     if err != nil {
         log.Error(err)
     }
