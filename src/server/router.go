@@ -17,7 +17,7 @@ var Router = func() *mux.Router {
 
     // router
     router := mux.NewRouter().StrictSlash(true)
-    router.NotFoundHandler = useHandler(frontend.Error404(useTemplate("error404.html")))
+    router.NotFoundHandler = useHandler(frontend.Error404(useTemplate("error/error404.html")))
 
     matcherFunc := func(r *http.Request, rm *mux.RouteMatch) bool {
         return strings.Contains(r.RequestURI, ".")
@@ -48,6 +48,7 @@ var Router = func() *mux.Router {
     router.HandleFunc("/admin/news",             useHandler(backend.News(useBackendTemplate("news/news.html")),         admin, mongo))
     router.HandleFunc("/admin/news/create",      useHandler(backend.NewsCreate(useBackendTemplate("news/create.html")), admin))
     router.HandleFunc("/admin/news/save",        useHandler(backend.NewsSave(),                                         admin, mongo))
+    router.HandleFunc("/admin/news/edit/{id}",   useHandler(backend.NewsEdit(useBackendTemplate("news/edit.html")),     admin, mongo))
     router.HandleFunc("/admin/news/delete/{id}", useHandler(backend.NewsDelete(),                                       admin, mongo))
 
     return router

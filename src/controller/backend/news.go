@@ -32,13 +32,29 @@ func NewsCreate(tpl *controller.TplController) func(w http.ResponseWriter, r *ht
     }
 }
 
+func NewsEdit(tpl *controller.TplController) func(w http.ResponseWriter, r *http.Request) {
+    var tplVars struct{
+        News *news.News
+    }
+
+    return func(w http.ResponseWriter, r *http.Request) {
+        mongoSession := context.Get(r, "mongoDB")
+        vars := mux.Vars(r)
+
+        tplVars.News = &news.News{Id: bson.ObjectIdHex(vars["id"])}
+        tplVars.News.Load(mongoSession.(*mgo.Session))
+
+        tpl.Render(w, r, tplVars)
+    }
+}
+
 func NewsSave() func(w http.ResponseWriter, r *http.Request) {
     return func(w http.ResponseWriter, r *http.Request) {
         user := context.Get(r, "user").(user.User)
         mongoSession := context.Get(r, "mongoDB")
 
         r.ParseForm()
-        n := news.NewNews(r.FormValue("title"), r.FormValue("body"), user)
+        n := news.NewNews(r.FormValue("title"), r.FormValue("htmlBody"), user)
         n.Insert(mongoSession.(*mgo.Session))
 
         http.Redirect(w, r, "/admin/news", http.StatusFound)

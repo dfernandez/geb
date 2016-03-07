@@ -54,6 +54,15 @@ func (n *News) Edited() string {
 	return n.EditedTs.Format(time.RFC822)
 }
 
+func (n *News) Load(session *mgo.Session) {
+	c := session.DB(config.MongoDatabase).C("news")
+	err := c.Find(bson.M{"_id": n.Id}).One(n)
+
+	if err != nil {
+		log.Error(err)
+	}
+}
+
 func (n *News) Insert(session *mgo.Session) {
 	n.CreatedTs = time.Now()
 	n.save(session)
