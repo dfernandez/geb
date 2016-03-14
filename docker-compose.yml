@@ -1,0 +1,16 @@
+golang:
+    build: .
+    links:
+     - mongo
+    expose:
+     - "8000"
+
+nginx:
+    build: ./nginx
+    links:
+     - golang
+    ports:
+     - "80:80"
+
+mongo:
+    image: mongo
