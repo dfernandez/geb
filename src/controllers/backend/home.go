@@ -2,14 +2,19 @@ package backend
 
 import (
     "net/http"
-    "github.com/dfernandez/geb/src/controller"
     "github.com/gorilla/context"
     "gopkg.in/mgo.v2"
     "github.com/dfernandez/geb/src/models/user"
     "github.com/dfernandez/geb/src/models/news"
+	"github.com/dfernandez/gcore/controller"
 )
 
-func Home(tpl *controller.TplController) func(w http.ResponseWriter, r *http.Request) {
+var Home = func() func(w http.ResponseWriter, r *http.Request) {
+	tpl := &controller.Controller{
+		Template: "backend/home/home.html",
+		Layout:   "backend.html",
+	}
+
     var tplVars struct{
         ProfilesCount int
         NewsCount int
@@ -22,4 +27,4 @@ func Home(tpl *controller.TplController) func(w http.ResponseWriter, r *http.Req
 
         tpl.Render(w, r, tplVars)
     }
-}
+}()

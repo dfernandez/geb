@@ -11,7 +11,7 @@
 <p>
     <a href="/">home</a> |
     <a href="/profile">profile</a> |
-    {{if .Profile.Email}}<a href="/logout">logout</a> [{{.Profile.Name}}]{{else}}<a href="/login">login</a>{{end}}
+    {{if .Profile}}<a href="/logout">logout</a> [{{.Profile.Name}}]{{else}}<a href="/login">login</a>{{end}}
 </p>
 <hr />
 

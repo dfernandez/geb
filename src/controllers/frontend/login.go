@@ -1,29 +1,36 @@
 package frontend
 
 import (
+	log "github.com/Sirupsen/logrus"
+
     "net/http"
     "golang.org/x/oauth2"
-    "github.com/dfernandez/geb/config"
-    log "github.com/Sirupsen/logrus"
-    "github.com/gorilla/sessions"
-    "github.com/dfernandez/geb/src/controller"
     "io/ioutil"
     "encoding/json"
     "encoding/gob"
+
+	"github.com/dfernandez/geb/config"
+	"github.com/gorilla/sessions"
     "github.com/dfernandez/geb/src/models/user"
-    "github.com/gorilla/context"
-    "gopkg.in/mgo.v2"
+	"github.com/dfernandez/gcore/controller"
+	"github.com/gorilla/context"
+	"gopkg.in/mgo.v2"
 )
 
-func Login(tpl *controller.TplController) func(w http.ResponseWriter, r *http.Request) {
+var Login = func() func(w http.ResponseWriter, r *http.Request) {
+	tpl := &controller.Controller{
+		Template: "frontend/login/login.html",
+		Layout:   "frontend.html",
+	}
+
     var tplVars struct{}
 
     return func(w http.ResponseWriter, r *http.Request) {
         tpl.Render(w, r, tplVars)
     }
-}
+}()
 
-func Logout() func(w http.ResponseWriter, r *http.Request) {
+var Logout = func() func(w http.ResponseWriter, r *http.Request) {
     return func(w http.ResponseWriter, r *http.Request) {
         cookie := &http.Cookie{
             Name:   config.SessionName,
@@ -34,9 +41,9 @@ func Logout() func(w http.ResponseWriter, r *http.Request) {
         http.SetCookie(w, cookie)
         http.Redirect(w, r, "/", http.StatusFound)
     }
-}
+}()
 
-func Callback() func(w http.ResponseWriter, r *http.Request) {
+var Callback = func() func(w http.ResponseWriter, r *http.Request) {
     conf  := config.OAuthConfig
     store := sessions.NewCookieStore(config.HashKey)
     store.MaxAge(0)
@@ -95,6 +102,7 @@ func Callback() func(w http.ResponseWriter, r *http.Request) {
             profile["email"].(string),
             profile["locale"].(string),
             profile["picture"].(string))
+
         u.Init(mongoSession.(*mgo.Session))
 
         // Saving the information to the session.
@@ -111,7 +119,8 @@ func Callback() func(w http.ResponseWriter, r *http.Request) {
         // Update last login
         u.UpdateActivity(mongoSession.(*mgo.Session))
 
+
         // Redirect to logged in page
         http.Redirect(w, r, "/profile", http.StatusMovedPermanently)
     }
-}
+}()
