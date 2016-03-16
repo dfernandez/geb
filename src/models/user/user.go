@@ -42,6 +42,16 @@ func NewUser(name string, email string, locale string, picture string) *User {
     }
 }
 
+var IsAdmin = func(u interface{}) bool {
+	for _, adm := range config.Administrators {
+		if adm == u.(User).Email {
+			return true
+		}
+	}
+
+	return false
+}
+
 func (p *User) Init(session *mgo.Session) {
     var user User
     c := session.DB(config.MongoDatabase).C("users")
@@ -56,16 +66,6 @@ func (p *User) Init(session *mgo.Session) {
     p.Id             = user.Id
     p.LastLoginTs    = user.LastLoginTs
     p.RegistrationTs = user.RegistrationTs
-}
-
-func (p *User) IsAdmin() bool {
-    for _, adm := range config.Administrators {
-        if adm == p.Email {
-            return true
-        }
-    }
-
-    return false
 }
 
 func (p *User) UpdateActivity(session *mgo.Session) {

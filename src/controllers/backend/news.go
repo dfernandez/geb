@@ -2,16 +2,22 @@ package backend
 
 import (
     "net/http"
-    "github.com/dfernandez/geb/src/controller"
     "gopkg.in/mgo.v2"
-    "github.com/gorilla/context"
+	"gopkg.in/mgo.v2/bson"
+
     "github.com/dfernandez/geb/src/models/news"
     "github.com/dfernandez/geb/src/models/user"
-    "github.com/gorilla/mux"
-    "gopkg.in/mgo.v2/bson"
+	"github.com/dfernandez/gcore/controller"
+	"github.com/gorilla/context"
+	"github.com/gorilla/mux"
 )
 
-func News(tpl *controller.TplController) func(w http.ResponseWriter, r *http.Request) {
+var News = func() func(w http.ResponseWriter, r *http.Request) {
+	tpl := &controller.Controller{
+		Template: "backend/news/news.html",
+		Layout:   "backend.html",
+	}
+
     var tplVars struct{
         News []news.News
     }
@@ -22,17 +28,27 @@ func News(tpl *controller.TplController) func(w http.ResponseWriter, r *http.Req
 
         tpl.Render(w, r, tplVars)
     }
-}
+}()
 
-func NewsCreate(tpl *controller.TplController) func(w http.ResponseWriter, r *http.Request) {
+var NewsCreate = func() func(w http.ResponseWriter, r *http.Request) {
+	tpl := &controller.Controller{
+		Template: "backend/news/create.html",
+		Layout:   "backend.html",
+	}
+
     var tplVars struct{}
 
     return func(w http.ResponseWriter, r *http.Request) {
         tpl.Render(w, r, tplVars)
     }
-}
+}()
 
-func NewsEdit(tpl *controller.TplController) func(w http.ResponseWriter, r *http.Request) {
+var NewsEdit = func() func(w http.ResponseWriter, r *http.Request) {
+	tpl := &controller.Controller{
+		Template: "backend/news/edit.html",
+		Layout:   "backend.html",
+	}
+
     var tplVars struct{
         News *news.News
     }
@@ -46,9 +62,9 @@ func NewsEdit(tpl *controller.TplController) func(w http.ResponseWriter, r *http
 
         tpl.Render(w, r, tplVars)
     }
-}
+}()
 
-func NewsSave() func(w http.ResponseWriter, r *http.Request) {
+var NewsSave = func() func(w http.ResponseWriter, r *http.Request) {
     return func(w http.ResponseWriter, r *http.Request) {
         user := context.Get(r, "user").(user.User)
         mongoSession := context.Get(r, "mongoDB")
@@ -59,9 +75,9 @@ func NewsSave() func(w http.ResponseWriter, r *http.Request) {
 
         http.Redirect(w, r, "/admin/news", http.StatusFound)
     }
-}
+}()
 
-func NewsDelete() func(w http.ResponseWriter, r *http.Request) {
+var NewsDelete = func() func(w http.ResponseWriter, r *http.Request) {
     return func(w http.ResponseWriter, r *http.Request) {
         mongoSession := context.Get(r, "mongoDB")
         vars := mux.Vars(r)
@@ -71,4 +87,4 @@ func NewsDelete() func(w http.ResponseWriter, r *http.Request) {
 
         http.Redirect(w, r, "/admin/news", http.StatusFound)
     }
-}
+}()
