@@ -23,7 +23,15 @@ var Login = func() func(w http.ResponseWriter, r *http.Request) {
 		Layout:   "frontend.html",
 	}
 
-    var tplVars struct{}
+    var tplVars struct{
+        ClientId string
+        Domain string
+        CallbackURL string
+    }
+
+    tplVars.ClientId    = config.OAuthConfig.ClientID
+    tplVars.Domain      = "web83-es.eu.auth0.com"
+    tplVars.CallbackURL = config.OAuthConfig.RedirectURL
 
     return func(w http.ResponseWriter, r *http.Request) {
         tpl.Render(w, r, tplVars)

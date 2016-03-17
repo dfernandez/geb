@@ -2,10 +2,10 @@
 
 <script src="https://cdn.auth0.com/js/lock-8.2.min.js"></script>
 <script type="text/javascript">
-    var lock = new Auth0Lock('wneopuiGCXW0ZqNJGPy3i8p4M4mtAgwS', 'web83-es.eu.auth0.com');
+    var lock = new Auth0Lock('{{ .ClientId }}', '{{ .Domain }}');
 
     lock.show({
-        callbackURL: 'http://localhost:8000/login/callback',
+        callbackURL: '{{ .CallbackURL }}',
         responseType: 'code',
         authParams: {
             scope: 'openid profile',
